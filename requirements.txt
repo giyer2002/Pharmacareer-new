@@ -1,0 +1,8 @@
+Flask
+flask-cors
+werkzeug
+PyPDF2
+docx2txt
+requests
+gunicorn
+psycopg2-binary
