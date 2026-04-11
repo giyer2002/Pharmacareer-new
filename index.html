@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PharmaCareer Hub | Biotech & Pharma Jobs</title>
+  <meta name="description" content="Live biotech, pharmaceutical, and life sciences jobs from Pfizer, Novartis, Moderna, Regeneron & 400+ companies. Updated daily." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .logo-font { font-family: 'Space Grotesk', sans-serif; }
+    .glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
+    .hero-bg { background: linear-gradient(135deg, #0a1f1a, #112e2a); }
+    .job-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+    .job-card:hover { transform: translateY(-6px); box-shadow: 0 25px 50px -12px rgb(0 212 170 / 0.3); }
+    .nav-link { padding: 12px 24px; border-radius: 9999px; transition: all 0.3s ease; }
+    .nav-link:hover { background: rgba(255,255,255,0.1); }
+    .nav-link.active { background: rgba(0, 212, 170, 0.25); color: #00d4aa; }
+    #tab-0 { transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1), padding 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease; overflow: hidden; max-height: 100vh; opacity: 1; }
+    #tab-0.collapsed { max-height: 0; padding-top: 0; padding-bottom: 0; opacity: 0; min-height: 0 !important; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { width: 48px; height: 48px; border: 3px solid rgba(0,212,170,0.2); border-top-color: #00d4aa; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes pulse-dot { 0%,80%,100%{opacity:0.2;transform:scale(0.8);}40%{opacity:1;transform:scale(1);} }
+    .dot { display:inline-block;width:8px;height:8px;border-radius:50%;background:#00d4aa;margin:0 3px; }
+    .dot:nth-child(1){animation:pulse-dot 1.2s ease-in-out infinite 0s;}
+    .dot:nth-child(2){animation:pulse-dot 1.2s ease-in-out infinite 0.2s;}
+    .dot:nth-child(3){animation:pulse-dot 1.2s ease-in-out infinite 0.4s;}
+    .score-bar-fill { width: 0%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+    #profile-panel { transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease; overflow: hidden; max-height: 0; opacity: 0; }
+    #profile-panel.open { max-height: 480px; opacity: 1; }
+    .match-glow { box-shadow: 0 0 20px rgb(0 212 170 / 0.4); }
+    .filter-chip { transition: all 0.2s ease; }
+    .filter-chip.active { background-color: #00d4aa; color: #0a1f1a; border-color: #00d4aa; }
+    .key-match-container { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
+  </style>
+</head>
+<body class="bg-[#0a1f1a] text-white">
+
+  <!-- Navbar -->
+  <nav class="glass fixed top-0 left-0 right-0 z-50 border-b border-white/10">
+    <div class="max-w-screen-2xl mx-auto px-8 py-5 flex items-center justify-between">
+      <div onclick="showTab(0)" class="flex items-center gap-3 cursor-pointer hover:opacity-90 transition-all">
+        <div class="w-9 h-9 bg-emerald-400 rounded-2xl flex items-center justify-center text-2xl">🧬</div>
+        <span class="logo-font text-3xl tracking-tighter">PharmaCareer</span>
+      </div>
+      <div class="flex items-center gap-8 text-sm font-medium">
+        <a onclick="showTab(0)" id="nav-0" class="nav-link active cursor-pointer">Search Jobs</a>
+        <a onclick="showTab(1)" id="nav-1" class="nav-link cursor-pointer">Saved Jobs</a>
+        <a onclick="showTab(2)" id="nav-2" class="nav-link cursor-pointer">For Employers</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero / Search Tab -->
+  <div id="tab-0" class="tab-content hero-bg hidden pt-24 min-h-screen flex items-center">
+    <div class="max-w-screen-2xl mx-auto px-8 w-full">
+      <div class="max-w-3xl mx-auto text-center">
+        <h1 class="mx-auto max-w-fit text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tighter leading-none whitespace-nowrap mb-6">
+          Find your next breakthrough role
+        </h1>
+        <p class="text-xl md:text-2xl text-gray-300 mb-12 max-w-2xl mx-auto">
+          Live opportunities in biotech, pharma &amp; life sciences — updated every hour
+        </p>
+        <div class="glass rounded-3xl p-1.5 shadow-2xl max-w-2xl mx-auto">
+          <div class="flex items-center bg-white/5 rounded-3xl px-2 py-2">
+            <input id="job-title" type="text" class="flex-1 bg-transparent text-white placeholder-gray-400 focus:outline-none text-lg px-6 py-4" placeholder="Job title or keyword">
+            <div class="h-8 w-px bg-white/20 mx-2"></div>
+            <input id="location" type="text" class="flex-1 bg-transparent text-white placeholder-gray-400 focus:outline-none text-lg px-6 py-4" placeholder="Location or Remote">
+            <button onclick="runSearch()" class="bg-emerald-400 hover:bg-emerald-500 text-black font-semibold px-8 py-4 rounded-3xl flex items-center gap-3 transition-all ml-2">
+              Search <span class="text-2xl leading-none">→</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Area -->
+  <div id="results-area" class="max-w-screen-2xl mx-auto px-8 py-8"></div>
+
+  <!-- Saved Jobs Tab -->
+  <div id="tab-1" class="tab-content hidden pt-24">
+    <div class="max-w-screen-2xl mx-auto px-8 py-12">
+      <h2 class="text-4xl font-semibold mb-8">Your Saved Jobs</h2>
+      <div id="saved-jobs-list" class="space-y-6"></div>
+    </div>
+  </div>
+
+  <!-- For Employers Tab -->
+  <div id="tab-2" class="tab-content hidden pt-24">
+    <div class="max-w-screen-2xl mx-auto px-8 py-20 text-center">
+      <h2 class="text-5xl font-semibold mb-6">Hire the best talent in life sciences</h2>
+      <p class="text-xl text-gray-400 max-w-2xl mx-auto">Post your open roles and reach thousands of qualified biotech &amp; pharma professionals.</p>
+      <button class="mt-10 bg-emerald-400 hover:bg-emerald-500 px-12 py-6 rounded-3xl text-xl font-semibold text-black">Post a Job — Free for 30 days</button>
+    </div>
+  </div>
+
+  <footer class="bg-black/40 py-12 text-center text-gray-400">
+    <p>&copy; 2026 PharmaCareer Hub • Built for the future of life sciences</p>
+    <p class="mt-3 text-sm">Questions? Contact us at <a href="mailto:info@pharmacareerhub.com" class="text-emerald-400 hover:text-emerald-300 transition">info@pharmacareerhub.com</a></p>
+  </footer>
+
+  <script>
+    const BACKEND = window.location.origin;
+    let allJobs = [];
+    let filteredJobs = [];
+    let savedJobs = JSON.parse(localStorage.getItem('savedJobs')) || [];
+    let candidateProfile = localStorage.getItem('candidateProfile') || '';
+    let activeFilters = { workStyle: new Set(), therapeutic: new Set(), roleType: new Set() };
+
+    const FILTER_OPTIONS = {
+      workStyle: ['Remote', 'Hybrid', 'On-site'],
+      therapeutic: ['Oncology', 'Immunology', 'Rare Disease', 'CNS', 'Cardiovascular', 'Infectious Disease', 'Neurology', 'Metabolic', 'Autoimmune'],
+      roleType: ['Regulatory Affairs', 'Clinical Operations', 'Pharmacovigilance', 'Medical Affairs', 'CMC', 'Quality Assurance', 'Biostatistics', 'Drug Safety']
+    };
+
+    const CHUNK = 6;
+
+    function getJobCategories(job) {
+      const text = `${job.title || ''} ${job.description || ''}`.toLowerCase();
+      const cats = { therapeutic: [], roleType: [] };
+      FILTER_OPTIONS.therapeutic.forEach(area => { if (text.includes(area.toLowerCase())) cats.therapeutic.push(area); });
+      FILTER_OPTIONS.roleType.forEach(role => { if (text.includes(role.toLowerCase())) cats.roleType.push(role); });
+      return cats;
+    }
+
+    // ✅ Real posted dates from SerpApi
+    function getPostedDate(job) {
+      if (job.posted_date) return job.posted_date;
+      if (job.extensions && Array.isArray(job.extensions)) {
+        const dateStr = job.extensions.find(ext => 
+          typeof ext === 'string' && 
+          (ext.includes('ago') || ext.includes('hour') || ext.includes('day') || ext.includes('today'))
+        );
+        if (dateStr) return dateStr;
+      }
+      if (job.detected_extensions?.posted_at) return job.detected_extensions.posted_at;
+      return 'Recently posted';
+    }
+
+    function applyFilters() {
+      filteredJobs = allJobs.filter(job => {
+        if (activeFilters.workStyle.size > 0 && !activeFilters.workStyle.has(job.remote_hybrid)) return false;
+        if (activeFilters.therapeutic.size > 0) {
+          const cats = getJobCategories(job);
+          if (!cats.therapeutic.some(t => activeFilters.therapeutic.has(t))) return false;
+        }
+        if (activeFilters.roleType.size > 0) {
+          const cats = getJobCategories(job);
+          if (!cats.roleType.some(r => activeFilters.roleType.has(r))) return false;
+        }
+        return true;
+      });
+    }
+
+    function renderFilterBar() {
+      let html = `<div class="glass rounded-3xl p-6 mb-8">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold text-emerald-400 text-lg">🔎 Smart Filters</h3>
+          <button onclick="clearFilters()" class="text-sm text-gray-400 hover:text-white">Clear all</button>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-6">`;
+
+      // Work Style: now uses grid grid-cols-3 so the 3 buttons are distributed evenly across the full column width
+      // (eliminates the large empty gap on the right that was visible in the original flex layout)
+      html += `<div><p class="text-xs uppercase tracking-widest text-gray-400 mb-2">Work Style</p><div class="grid grid-cols-3 gap-2">`;
+      FILTER_OPTIONS.workStyle.forEach(style => {
+        const active = activeFilters.workStyle.has(style) ? 'active' : '';
+        html += `<button onclick="toggleFilter('workStyle', '${style}')" class="filter-chip text-sm px-4 py-2 border border-white/20 rounded-3xl ${active}">${style}</button>`;
+      });
+      html += `</div></div>`;
+
+      html += `<div><p class="text-xs uppercase tracking-widest text-gray-400 mb-2">Therapeutic Area</p><div class="flex flex-wrap gap-2 max-h-28 overflow-y-auto pr-2">`;
+      FILTER_OPTIONS.therapeutic.forEach(area => {
+        const active = activeFilters.therapeutic.has(area) ? 'active' : '';
+        html += `<button onclick="toggleFilter('therapeutic', '${area}')" class="filter-chip text-sm px-4 py-2 border border-white/20 rounded-3xl ${active}">${area}</button>`;
+      });
+      html += `</div></div>`;
+
+      html += `<div><p class="text-xs uppercase tracking-widest text-gray-400 mb-2">Role Type</p><div class="flex flex-wrap gap-2 max-h-28 overflow-y-auto pr-2">`;
+      FILTER_OPTIONS.roleType.forEach(role => {
+        const active = activeFilters.roleType.has(role) ? 'active' : '';
+        html += `<button onclick="toggleFilter('roleType', '${role}')" class="filter-chip text-sm px-4 py-2 border border-white/20 rounded-3xl ${active}">${role}</button>`;
+      });
+      html += `</div></div></div></div>`;
+      return html;
+    }
+
+    function toggleFilter(category, value) {
+      if (activeFilters[category].has(value)) activeFilters[category].delete(value);
+      else activeFilters[category].add(value);
+      applyFilters();
+      renderFilteredResults();
+    }
+
+    function clearFilters() {
+      activeFilters = { workStyle: new Set(), therapeutic: new Set(), roleType: new Set() };
+      applyFilters();
+      renderFilteredResults();
+    }
+
+    async function runSearch() {
+      const title = document.getElementById('job-title').value.trim();
+      const loc = document.getElementById('location').value.trim() || 'USA';
+      if (!title) return alert('Please enter a job title.');
+
+      const resultsArea = document.getElementById('results-area');
+      document.getElementById('tab-0').classList.add('collapsed');
+      resultsArea.innerHTML = `<div class="flex flex-col items-center justify-center py-24 gap-6"><div class="spinner"></div><p class="text-gray-300 text-xl font-medium">Searching live opportunities</p><div><span class="dot"></span><span class="dot"></span><span class="dot"></span></div></div>`;
+
+      try {
+        const res = await fetch(`${BACKEND}/api/search`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, location: loc, num_jobs: 30 })
+        });
+        if (!res.ok) throw new Error();
+        allJobs = await res.json();
+        applyFilters();
+        renderFilteredResults();
+      } catch {
+        resultsArea.innerHTML = `<div class="text-red-400 text-center py-12">Something went wrong. Please try again.</div>`;
+      }
+    }
+
+    function renderFilteredResults() {
+      const resultsArea = document.getElementById('results-area');
+      if (filteredJobs.length === 0) {
+        resultsArea.innerHTML = `<p class="text-center text-gray-400 py-12">No matching roles found with your current filters.</p>`;
+        return;
+      }
+
+      let html = `<p class="text-emerald-400 text-center mb-6 text-xl">✅ Found ${filteredJobs.length} live opportunities</p>${renderFilterBar()}`;
+
+      html += `<div class="glass rounded-3xl p-6 mb-8 max-w-3xl mx-auto">
+        <button onclick="toggleProfilePanel()" class="w-full flex items-center justify-between gap-4 text-left">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-emerald-400/20 flex items-center justify-center text-emerald-400 text-sm font-bold">AI</div>
+            <div>
+              <p class="font-semibold text-white text-sm">AI Match Scoring</p>
+              <p id="profile-status-label" class="text-xs mt-0.5 ${candidateProfile ? 'text-emerald-400' : 'text-gray-400'}">${candidateProfile ? '✓ Profile ready — AI match active' : 'Paste summary or upload CV for AI scoring'}</p>
+            </div>
+          </div>
+          <span id="profile-chevron" class="text-gray-400 text-lg transition-transform duration-300">▼</span>
+        </button>
+        <div id="profile-panel" class="${candidateProfile ? '' : ''}">
+          <div class="mt-5 border-t border-white/10 pt-5">
+            <p class="text-sm text-gray-400 mb-3">Paste your experience OR upload your CV (PDF or Word)</p>
+            <div class="flex gap-3 mb-4">
+              <label class="flex-1 cursor-pointer bg-white/5 hover:bg-white/10 border border-white/20 rounded-2xl px-5 py-4 text-center transition flex items-center justify-center gap-2">
+                <input type="file" id="cv-upload" accept=".pdf,.docx" class="hidden" onchange="uploadCV()">
+                <span class="text-emerald-400 text-sm font-medium">📄 Upload CV (PDF or Word)</span>
+              </label>
+            </div>
+            <textarea id="profile-input" class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-emerald-400/50 resize-none" rows="6" placeholder="Or paste your resume summary here...">${candidateProfile}</textarea>
+            <div class="flex gap-3 mt-3">
+              <button onclick="saveProfile()" class="bg-emerald-400 hover:bg-emerald-500 text-black font-semibold px-6 py-2.5 rounded-2xl text-sm">Save &amp; Score All Jobs</button>
+              ${candidateProfile ? `<button onclick="clearProfile()" class="text-gray-400 hover:text-white text-sm px-4 py-2.5">Clear profile</button>` : ''}
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+      filteredJobs.forEach((job) => {
+        const originalIndex = allJobs.findIndex(j => j.link === job.link);
+        const isSaved = savedJobs.some(s => s.link === job.link);
+        const hasScore = job._score;
+        const overall = hasScore ? job._score.overall : null;
+
+        let badgeColor = 'text-gray-400 border-white/20';
+        let barColor = '#6b7280';
+        if (overall !== null) {
+          if (overall >= 80) { badgeColor = 'text-emerald-400 border-emerald-400/50 match-glow'; barColor = '#00d4aa'; }
+          else if (overall >= 60) { badgeColor = 'text-amber-400 border-amber-400/50'; barColor = '#f59e0b'; }
+          else { badgeColor = 'text-red-400 border-red-400/40'; barColor = '#f87171'; }
+        }
+
+        const salaryHTML = job.salary ? `<div class="mt-3 flex items-center gap-2 text-emerald-300 text-sm font-medium"><span class="text-lg">💰</span> ${job.salary}</div>` : '';
+        let keyMatchesHTML = '';
+        if (hasScore && job._score.key_matches && Array.isArray(job._score.key_matches)) {
+          keyMatchesHTML = `<div class="key-match-container mt-5 rounded-2xl p-5">
+            <p class="text-xs uppercase tracking-widest text-gray-400 mb-3">Key Requirements Match</p>
+            <div class="space-y-3 text-sm">${job._score.key_matches.map(b => `<div class="flex gap-3"><span class="text-emerald-400 font-medium">✓</span><span class="text-gray-200">${b}</span></div>`).join('')}</div>
+          </div>`;
+        }
+
+        const companyName = (job.company || '').toLowerCase();
+        let badgeHTML = '';
+        if (companyName.includes('pfizer') || companyName.includes('moderna') || companyName.includes('regeneron') || companyName.includes('novartis')) {
+          badgeHTML = `<span class="px-3 py-1 text-[10px] bg-emerald-400/10 text-emerald-400 rounded-3xl border border-emerald-400/30">🏛️ Big Pharma</span>`;
+        } else if (companyName.includes('biotech') || companyName.includes('therapeutics')) {
+          badgeHTML = `<span class="px-3 py-1 text-[10px] bg-amber-400/10 text-amber-400 rounded-3xl border border-amber-400/30">🚀 Biotech</span>`;
+        }
+
+        html += `<div class="job-card glass rounded-3xl p-8 mb-8" id="card-${originalIndex}">
+          <div class="flex justify-between items-start gap-4">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-3 flex-wrap">
+                <h2 class="text-2xl font-semibold leading-tight">${job.title}</h2>
+                ${badgeHTML}
+              </div>
+              <div class="flex flex-wrap gap-4 text-sm text-gray-300 mt-3">
+                <span>🏢 ${job.company}</span>
+                <span>📍 ${job.location}</span>
+                <span>📅 ${getPostedDate(job)}</span>
+                <span class="px-3 py-0.5 bg-emerald-400/20 text-emerald-400 rounded-full text-xs font-medium">${job.remote_hybrid}</span>
+              </div>
+              ${salaryHTML}
+            </div>
+            <div class="flex-shrink-0 text-center">
+              ${overall !== null ? `<div class="border rounded-2xl px-4 py-3 ${badgeColor}"><div class="text-3xl font-semibold leading-none">${overall}</div><div class="text-xs mt-1 opacity-70">% match</div></div>` : 
+                candidateProfile ? `<div class="border border-white/10 rounded-2xl px-4 py-3 text-gray-500"><div id="score-spinner-${originalIndex}" class="w-6 h-6 border-2 border-white/10 border-t-emerald-400 rounded-full mx-auto" style="animation: spin 0.8s linear infinite;"></div><div class="text-xs mt-1">scoring</div></div>` : 
+                `<div onclick="toggleProfilePanel()" class="border border-white/10 rounded-2xl px-4 py-3 text-gray-600 cursor-pointer hover:border-white/20 transition"><div class="text-xl">—</div><div class="text-xs mt-1">add profile</div></div>`}
+            </div>
+          </div>
+          ${hasScore ? `<div class="mt-5 grid grid-cols-2 gap-x-8 gap-y-2" id="bars-${originalIndex}">${renderScoreBars(job._score, barColor)}</div>
+          <div class="mt-4 text-sm rounded-xl px-4 py-3 ${job._score.insight_type === 'positive' ? 'bg-emerald-400/10 text-emerald-300 border border-emerald-400/20' : 'bg-amber-400/10 text-amber-300 border border-amber-400/20'}">${job._score.insight}</div>` : ''}
+          ${keyMatchesHTML}
+          <p class="mt-5 text-gray-300 text-sm leading-relaxed line-clamp-3">${job.description}</p>
+          <div class="flex gap-4 mt-6">
+            <button onclick="window.open('${job.link}', '_blank')" class="flex-1 bg-white text-black font-semibold py-4 rounded-2xl hover:bg-gray-100 transition text-sm">View Full Listing</button>
+            <button onclick="saveJob(${originalIndex})" id="save-btn-${originalIndex}" class="px-8 border font-semibold rounded-2xl transition text-sm ${isSaved ? 'border-emerald-400 text-emerald-400 bg-emerald-400/10' : 'border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-black'}">
+              ${isSaved ? '✓ Saved' : 'Save'}
+            </button>
+          </div>
+        </div>`;
+      });
+
+      resultsArea.innerHTML = html;
+      if (candidateProfile) scoreAllJobs();
+    }
+
+    function renderScoreBars(score, color) {
+      const dims = [
+        { key: 'skills', label: 'Skills' },
+        { key: 'seniority', label: 'Seniority' },
+        { key: 'therapeutic', label: 'Disease area' },
+        { key: 'role_type', label: 'Role type' }
+      ];
+      return dims.map(d => `
+        <div class="flex items-center gap-3">
+          <span class="text-xs text-gray-400 w-24 flex-shrink-0">${d.label}</span>
+          <div class="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+            <div class="score-bar-fill h-full rounded-full" style="background:${color};width:${score[d.key]}%"></div>
+          </div>
+          <span class="text-xs font-medium w-6 text-right" style="color:${color}">${score[d.key]}</span>
+        </div>`).join('');
+    }
+
+    // Rest of your functions (profile, scoring, saved jobs, tabs) remain unchanged
+    function toggleProfilePanel() {
+      const panel = document.getElementById('profile-panel');
+      const chevron = document.getElementById('profile-chevron');
+      const isOpen = panel.classList.contains('open');
+      panel.classList.toggle('open', !isOpen);
+      chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+    }
+
+    function saveProfile() {
+      const input = document.getElementById('profile-input');
+      candidateProfile = input.value.trim();
+      localStorage.setItem('candidateProfile', candidateProfile);
+      const panel = document.getElementById('profile-panel');
+      const label = document.getElementById('profile-status-label');
+      const chevron = document.getElementById('profile-chevron');
+      if (panel) panel.classList.remove('open');
+      if (chevron) chevron.style.transform = '';
+      if (label) label.textContent = '✓ Profile saved — scoring jobs…';
+      scoreAllJobs();
+    }
+
+    function clearProfile() {
+      candidateProfile = '';
+      localStorage.removeItem('candidateProfile');
+      renderFilteredResults();
+    }
+
+    async function uploadCV() {
+      const fileInput = document.getElementById('cv-upload');
+      const file = fileInput.files[0];
+      if (!file) return;
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        const res = await fetch(`${BACKEND}/api/extract-cv`, { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.error) { alert(data.error); return; }
+        document.getElementById('profile-input').value = data.text;
+        candidateProfile = data.text;
+        localStorage.setItem('candidateProfile', candidateProfile);
+        saveProfile();
+        fileInput.value = '';
+      } catch (err) {
+        alert("Upload failed. Please try again.");
+      }
+    }
+
+    async function scoreAllJobs() {
+      if (!candidateProfile || !filteredJobs.length) return;
+      for (let i = 0; i < filteredJobs.length; i += CHUNK) {
+        const chunk = filteredJobs.slice(i, i + CHUNK);
+        await Promise.all(chunk.map(job => {
+          const idx = allJobs.findIndex(j => j.link === job.link);
+          return scoreJob(idx);
+        }));
+      }
+    }
+
+    async function scoreJob(index) {
+      const job = allJobs[index];
+      if (!job || job._score) return;
+      try {
+        const res = await fetch(`${BACKEND}/api/match`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            candidate_profile: candidateProfile,
+            job_title: job.title || '',
+            job_company: job.company || '',
+            job_description: job.description || ''
+          })
+        });
+        if (!res.ok) throw new Error();
+        const score = await res.json();
+        allJobs[index]._score = score;
+        filteredJobs = filteredJobs.map(j => j.link === job.link ? {...j, _score: score} : j);
+        renderFilteredResults();
+      } catch {
+        const spinner = document.getElementById(`score-spinner-${index}`);
+        if (spinner) spinner.closest('.border').innerHTML = '<div class="text-xs text-gray-600">—</div>';
+      }
+    }
+
+    function saveJob(index) {
+      const job = allJobs[index];
+      if (!savedJobs.some(s => s.link === job.link)) {
+        savedJobs.push(job);
+        localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
+        renderFilteredResults();
+      }
+    }
+
+    function renderSavedJobs() {
+      const container = document.getElementById('saved-jobs-list');
+      if (!savedJobs.length) {
+        container.innerHTML = `<p class="text-gray-400 text-center py-12">No saved jobs yet.</p>`;
+        return;
+      }
+      container.innerHTML = savedJobs.map(job => `
+        <div class="job-card glass rounded-3xl p-8">
+          <a href="${job.link}" target="_blank" class="text-2xl font-semibold hover:text-emerald-400 block">${job.title}</a>
+          <div class="flex gap-6 text-sm text-gray-300 mt-4">
+            <span>🏢 ${job.company}</span>
+            <span>📍 ${job.location}</span>
+          </div>
+          ${job._score ? `<div class="mt-4 flex items-center gap-3"><span class="text-2xl font-semibold ${job._score.overall >= 80 ? 'text-emerald-400' : job._score.overall >= 60 ? 'text-amber-400' : 'text-red-400'}">${job._score.overall}%</span><span class="text-sm text-gray-400">match score</span></div>` : ''}
+          <button onclick="removeSavedJob('${job.link}')" class="mt-6 text-red-400 text-sm hover:text-red-300 transition">Remove</button>
+        </div>`).join('');
+    }
+
+    function removeSavedJob(link) {
+      if (confirm('Remove this job?')) {
+        savedJobs = savedJobs.filter(j => j.link !== link);
+        localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
+        renderSavedJobs();
+      }
+    }
+
+    function showTab(n) {
+      [0,1,2].forEach(i => document.getElementById(`tab-${i}`).classList.add('hidden'));
+      document.getElementById(`tab-${n}`).classList.remove('hidden');
+      document.getElementById('results-area').style.display = n === 0 ? '' : 'none';
+      if (n === 0) document.getElementById('tab-0').classList.remove('collapsed');
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      document.getElementById(`nav-${n}`).classList.add('active');
+      if (n === 1) renderSavedJobs();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      showTab(0);
+      document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('keypress', e => { if (e.key === 'Enter') runSearch(); });
+      });
+    });
+  </script>
+</body>
+</html>
