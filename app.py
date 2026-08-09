@@ -3,6 +3,9 @@ import json
 import logging
 import requests
 import re
+import time
+import threading
+from datetime import datetime
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 
@@ -193,7 +196,110 @@ JOB DESCRIPTION:
             "error": "Scoring failed",
             "detail": "Please wait 30 seconds and try again (rate limit or temporary issue)"
         }), 500
+# ── SEO & CACHING LAYER (Makes Google index your site) ───────────────
+SEO_CACHE = {"jobs": [], "last_update": 0}
+SEO_LOCK = threading.Lock()
 
+def get_seo_jobs():
+    global SEO_CACHE
+    # Refresh cache every 12 hours (43200 seconds) to save SerpApi quota
+    if time.time() - SEO_CACHE["last_update"] > 43200 or not SEO_CACHE["jobs"]:
+        with SEO_LOCK:
+            if time.time() - SEO_CACHE["last_update"] > 43200 or not SEO_CACHE["jobs"]:
+                _seed_seo_jobs()
+    return SEO_CACHE["jobs"]
+
+def _seed_seo_jobs():
+    global SEO_CACHE
+    serp_api_key = os.environ.get("SERPAPI_KEY")
+    if not serp_api_key: return
+    
+    queries = [
+        "pharmacovigilance jobs", "regulatory affairs jobs", 
+        "clinical research jobs", "quality assurance pharma jobs",
+        "medical affairs jobs", "biostatistics jobs"
+    ]
+    all_jobs, seen = [], set()
+    
+    for q in queries:
+        try:
+            params = {"engine": "google_jobs", "q": q, "hl": "en", "gl": "us", "api_key": serp_api_key}
+            r = requests.get("https://serpapi.com/search", params=params, timeout=15)
+            if r.status_code == 200:
+                for job in r.json().get("jobs_results", [])[:8]: # 8 jobs per query
+                    link = job.get("apply_link") or job.get("share_link") or job.get("link")
+                    if link and link not in seen:
+                        seen.add(link)
+                        slug = re.sub(r'[^a-z0-9]+', '-', (job.get("title","") + "-" + job.get("company_name","")).lower()).strip('-')[:80] or "job"
+                        all_jobs.append({
+                            "slug": slug, "title": job.get("title"), 
+                            "company": job.get("company_name"), "location": job.get("location"),
+                            "description": job.get("description", "")[:400], 
+                            "link": link, "posted": job.get("date_posted", "Recently")
+                        })
+        except Exception as e:
+            logger.error(f"SEO seed error: {e}")
+            
+    SEO_CACHE["jobs"] = all_jobs
+    SEO_CACHE["last_update"] = time.time()
+    logger.info(f"Seeded {len(all_jobs)} jobs for SEO")
+
+# Start seeding in background so it doesn't slow down app startup
+threading.Thread(target=get_seo_jobs, daemon=True).start()
+
+@app.route('/robots.txt')
+def robots_txt():
+    return "User-agent: *\nAllow: /\nSitemap: https://www.pharmacareerhub.com/sitemap.xml\n", 200, {'Content-Type': 'text/plain'}
+
+@app.route('/sitemap.xml')
+def sitemap_xml():
+    jobs = get_seo_jobs()
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    xml += "  <url><loc>https://www.pharmacareerhub.com/</loc></url>\n"
+    for j in jobs:
+        xml += f"  <url><loc>https://www.pharmacareerhub.com/job/{j['slug']}</loc></url>\n"
+    xml += "</urlset>"
+    return xml, 200, {'Content-Type': 'application/xml'}
+
+@app.route('/jobs')
+def all_jobs_page():
+    jobs = get_seo_jobs()
+    html = "<html><head><title>Live Pharma & Biotech Jobs</title></head><body style='font-family:system-ui;max-width:800px;margin:40px auto;padding:20px'>"
+    html += "<a href='/'>← Home</a><h1>Live Pharma & Biotech Jobs</h1><ul>"
+    for j in jobs:
+        html += f"<li><a href='/job/{j['slug']}'>{j['title']} at {j['company']} ({j['location']})</a></li>"
+    html += "</ul></body></html>"
+    return html
+
+@app.route('/job/<slug>')
+def job_page(slug):
+    jobs = get_seo_jobs()
+    job = next((j for j in jobs if j['slug'] == slug), None)
+    if not job: return "Job not found", 404
+    
+    # This JSON-LD is what gets your jobs into the "Google Jobs" blue box!
+    schema = {
+        "@context": "https://schema.org", "@type": "JobPosting", 
+        "title": job['title'], "description": job['description'], 
+        "datePosted": datetime.utcnow().strftime("%Y-%m-%d"), 
+        "hiringOrganization": {"@type": "Organization", "name": job['company']}, 
+        "jobLocation": {"@type": "Place", "address": {"@type": "PostalAddress", "addressLocality": job['location']}}, 
+        "directApplyUrl": job['link']
+    }
+    
+    html = f"""<!DOCTYPE html><html><head>
+    <title>{job['title']} at {job['company']} | PharmaCareer Hub</title>
+    <meta name="description" content="{job['description'][:150]}">
+    <script type="application/ld+json">{json.dumps(schema)}</script>
+    <style>body{{font-family:system-ui;max-width:800px;margin:40px auto;padding:20px;color:#0a1f1a}}a{{color:#00d4aa}}.btn{{background:#00d4aa;color:#000;padding:12px 24px;text-decoration:none;border-radius:8px;display:inline-block;margin-top:20px}}</style>
+    </head><body>
+    <a href="/">← Back to PharmaCareer Hub</a>
+    <h1>{job['title']}</h1>
+    <p><strong>{job['company']}</strong> • {job['location']} • {job['posted']}</p>
+    <p>{job['description']}</p>
+    <a href="{job['link']}" target="_blank" rel="noopener" class="btn">Apply on Company Site →</a>
+    </body></html>"""
+    return html
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
