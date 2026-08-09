@@ -139,7 +139,7 @@ JOB DESCRIPTION: {job_description}"""
 
         return jsonify(scores)
     except json.JSONDecodeError as e:
-        logger.error(f"JSON parsing failed: {str(e)}\nRaw response was: {raw[:500]}", exc_info=True)
+        logger.error(f"JSON parsing failed: {str(e)}", exc_info=True)
         return jsonify({"error": "Scoring failed", "detail": "AI model returned invalid format — please try again in a few seconds"}), 500
     except Exception as e:
         logger.error(f"Match scoring FAILED: {str(e)}", exc_info=True)
